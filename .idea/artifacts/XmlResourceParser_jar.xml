@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="XmlResourceParser:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/XmlResourceParser_jar</output-path>
+    <root id="archive" name="XmlResourceParser.jar">
+      <element id="module-output" name="XmlResourceParser" />
+    </root>
+  </artifact>
+</component>
