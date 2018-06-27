@@ -15,6 +15,7 @@ import static com.ConfigString.*;
  * @author 黄俊杰
  * 2018/6/27
  * .plist配置文件的解析器
+ * 转载自：http://archive.cnblogs.com/a/2391527/
  */
 public class PlistHandler extends DefaultHandler {
     //是否是根节点
