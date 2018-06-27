@@ -1,11 +1,18 @@
 package com;
 
 /**
- * 解析的对象
+ * @author 黄俊杰
+ * 2018/6/27
+ * 接受对象
  */
 public class XmlModelBean {
-
+    /**
+     * key关键字
+     */
     private String key;
+    /**
+     * 属性值
+     */
     private String value;
 
     public XmlModelBean() {

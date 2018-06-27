@@ -15,59 +15,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.ConfigString.*;
+
 /**
- * xml的解析工具
+ * @author 黄俊杰
+ * 2018/6/27
  */
-public class XmlParseTools {
+public class DomParseTool {
 
-    /**
-     * Android xml的根节点值
-     */
-    public static final String ANDROID_ELEMENT_ROOT = "resources";
-    /**
-     * Android xml的节点值
-     */
-    public static final String ANDROID_ELEMENT_NODE = "string";
-    /**
-     * Android xml节点下的属性值
-     */
-    public static final String ANDROID_ELEMENT_NAME = "name";
-
-    public static void domParse(InputStream sources, String key, File newFile) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(sources);
-            NodeList nodeList = document.getElementsByTagName(key);
-            Document newDocument = builder.newDocument();
-            newDocument.setXmlStandalone(true);
-            Element root = newDocument.createElement(ANDROID_ELEMENT_ROOT);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node item = nodeList.item(i);
-                String name = item.getAttributes().getNamedItem(ANDROID_ELEMENT_NAME).getNodeValue();
-                Element element = newDocument.createElement(key);
-                String value = item.getFirstChild().getNodeValue();
-                element.setAttribute(ANDROID_ELEMENT_NAME, name);
-                element.setTextContent(value);
-                root.appendChild(element);
-            }
-            newDocument.appendChild(root);
-            TransformerFactory tff = TransformerFactory.newInstance();
-            Transformer tf = tff.newTransformer();
-            tf.setOutputProperty(OutputKeys.INDENT, "yes");
-            tf.transform(new DOMSource(document), new StreamResult(newFile));
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 解析xml获取数据对象
@@ -190,8 +145,6 @@ public class XmlParseTools {
             e.printStackTrace();
             success = false;
         }
-
-
         return success;
     }
 
@@ -211,38 +164,63 @@ public class XmlParseTools {
         return path;
     }
 
+    public List<XmlModelBean> pull2Xml(InputStream is) {
+        List<XmlModelBean> list = new ArrayList<>();
+        XmlModelBean bean=null;
+
+        return list;
+    }
 
 
-    public static void main(String[] args)  {
 
+
+    public static void main(String[] args) {
         String root_path = getRootPath() + File.separator + "res" + File.separator;
-//        String resources = root_path + "strings.xml";
-//        File file = new File(resources);
-//        if (file.exists()) {
-//            try {
-//                InputStream in = new FileInputStream(file);
-//                List<XmlModelBean> beans = domGetData(in, ANDROID_ELEMENT_NODE, ANDROID_ELEMENT_NAME);
-//                if (null != beans) {
-//                    boolean success = createPlist(root_path + "test.plist", "1.0", beans);
-//                    boolean androidXml = createAndroidXml(ANDROID_ELEMENT_ROOT, ANDROID_ELEMENT_NODE, ANDROID_ELEMENT_NAME, beans, new File(root_path + "testString.xml"));
-//                    System.out.println(success);
-//                    System.out.println(androidXml);
-//                }
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        System.out.println(root_path);
+        String resources = root_path + "strings.xml";
+        File file = new File(resources);
+        if (file.exists()) {
+            try {
+                InputStream in = new FileInputStream(file);
+                List<XmlModelBean> beans = domGetData(in, ANDROID_ELEMENT_STRING, ANDROID_ELEMENT_NAME);
+                if (null != beans) {
+                    boolean success = createPlist(root_path + "test.plist", "1.0", beans);
+                    boolean androidXml = createAndroidXml(ANDROID_ELEMENT_ROOT, ANDROID_ELEMENT_STRING, ANDROID_ELEMENT_NAME, beans, new File(root_path + "testString.xml"));
+                    Dom4jHelper.parseXml(resources);
+                    Dom4jHelper.createXml(root_path+"string2.xml",beans,ConfigString.ANDROID_ELEMENT_STRING);
+                    System.out.println(success);
+                    System.out.println(androidXml);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println(root_path);
 
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         SAXParser saxParser = null;
         try {
             saxParser = saxParserFactory.newSAXParser();
-            PlistHandler plistHandler=new PlistHandler();
-            saxParser.parse(new File(root_path + "test.plist"),plistHandler);
+            PlistHandler plistHandler = new PlistHandler();
+            saxParser.parse(new File(root_path + "test.plist"), plistHandler);
             HashMap<String, Object> mapResult = plistHandler.getMapResult();
-            List<Object> arrayResult = plistHandler.getArrayResult();
+            System.out.println(mapResult.toString());
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        XmlHandler xmlHandler = new XmlHandler(ConfigString.ANDROID_ELEMENT_STRING);
+        try {
+            SAXParser newSAXParser = saxParserFactory.newSAXParser();
+            newSAXParser.parse(new File(root_path + "strings.xml"), xmlHandler);
+            List<XmlModelBean> list = xmlHandler.getList();
+            XmlModelBean xmlModelBean = list.get(0);
+            System.out.println(xmlModelBean.getKey() + "-->" + xmlModelBean.getValue());
+            System.out.println(list.toString());
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -252,5 +230,9 @@ public class XmlParseTools {
         }
 
 
+
     }
+
+
+
 }
